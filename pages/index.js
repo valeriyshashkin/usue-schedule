@@ -20,25 +20,26 @@ export default function Home() {
   const [allSuggestions, setAllSuggestions] = useState([]);
 
   useEffect(() => {
+    setGroup(localStorage.getItem("group") || "");
+    setSchedule(JSON.parse(localStorage.getItem("schedule") || "[]"));
     fetch("/api/suggestions")
       .then((res) => res.json())
       .then((res) => {
         setAllSuggestions(res);
-        setGroup(localStorage.getItem("group"));
-        setSchedule(JSON.parse(localStorage.getItem("schedule")));
       });
   }, []);
 
   function showSchedule() {
-    localStorage.setItem("group", group);
-    localStorage.setItem("schedule", JSON.stringify(schedule));
-
     fetch("/api/schedule", {
       method: "POST",
       body: JSON.stringify({ startDate, endDate, group }),
     })
       .then((res) => res.json())
-      .then((res) => setSchedule(res));
+      .then((res) => {
+        localStorage.setItem("group", group);
+        localStorage.setItem("schedule", JSON.stringify(res));
+        setSchedule(res);
+      });
   }
 
   function handleChange(e, { newValue }) {
