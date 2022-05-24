@@ -2,6 +2,7 @@
   "name": "Расписание УрГЭУ",
   "short_name": "Расписание",
   "theme_color": "#2a303c",
+  "background_color": "#2a303c",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
