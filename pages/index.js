@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Autosuggest from "react-autosuggest";
 import Head from "next/head";
 
@@ -17,6 +17,13 @@ export default function Home() {
   const [group, setGroup] = useState("");
   const [schedule, setSchedule] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [allSuggestions, setAllSuggestions] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/suggestions")
+      .then((res) => res.json())
+      .then((res) => setAllSuggestions(res));
+  }, []);
 
   function showSchedule() {
     fetch("/api/schedule", {
@@ -24,10 +31,7 @@ export default function Home() {
       body: JSON.stringify({ startDate, endDate, group }),
     })
       .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-        setSchedule(res);
-      });
+      .then((res) => setSchedule(res));
   }
 
   function handleChange(e, { newValue }) {
@@ -35,12 +39,16 @@ export default function Home() {
   }
 
   function fetchSuggestions({ value }) {
-    fetch("/api/suggestions", {
-      method: "POST",
-      body: JSON.stringify({ group: value }),
-    })
-      .then((res) => res.json())
-      .then((res) => setSuggestions(res));
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    setSuggestions(
+      inputLength === 0
+        ? []
+        : allSuggestions.filter(
+            (s) => s.toLowerCase().slice(0, inputLength) === inputValue
+          )
+    );
   }
 
   function clearSuggestions() {
@@ -97,9 +105,9 @@ export default function Home() {
                 </thead>
                 <tbody>
                   {pairs.map(
-                    ({ N, time, isCurrentPair, schedulePairs }) =>
+                    ({ N, time, isCurrentPair, schedulePairs }, id) =>
                       time !== "-" && (
-                        <tr>
+                        <tr key={id}>
                           <th className={`${isCurrentPair && "!bg-primary"}`}>
                             {N}
                           </th>
