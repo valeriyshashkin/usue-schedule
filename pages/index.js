@@ -127,9 +127,11 @@ export default function Home() {
   };
 
   return (
-    <div className="mx-auto max-w-screen-lg">
+    <div className="mx-auto max-w-screen-lg w-full">
       <Head>
         <title>Расписание УрГЭУ</title>
+        <meta name="theme-color" content="#2a303c" />
+        <link rel="manifest" href="/manifest.json" />
       </Head>
       <Autosuggest
         suggestions={suggestions}
@@ -204,6 +206,13 @@ export default function Home() {
             </div>
           </div>
         ))}
+        <a
+          href="https://www.flaticon.com/free-icons/calendar"
+          title="calendar icons"
+          className="link mt-4 mb-6 block text-center"
+        >
+          Calendar icons created by Freepik - Flaticon
+        </a>
       </div>
     </div>
   );
