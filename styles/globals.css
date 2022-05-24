@@ -1,16 +1,31 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.react-autosuggest__container {
+  @apply relative;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.react-autosuggest__input {
+  @apply input bg-gray-700 w-full m-4;
 }
 
-* {
-  box-sizing: border-box;
+.react-autosuggest__suggestions-container {
+  @apply hidden;
+}
+
+.react-autosuggest__suggestions-container--open {
+  @apply block mx-4 w-full bg-gray-700 rounded absolute;
+}
+
+.react-autosuggest__suggestions-list {
+  @apply max-h-[200px] lg:max-h-[400px] overflow-y-auto;
+}
+
+.react-autosuggest__suggestion {
+  @apply p-4 cursor-pointer;
+}
+
+.react-autosuggest__suggestion--highlighted {
+  @apply bg-primary;
 }
