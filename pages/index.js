@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Autosuggest from "react-autosuggest";
 import Head from "next/head";
 import startOfWeek from "date-fns/startOfWeek";
@@ -46,38 +46,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(true);
 
-  useEffect(() => {
-    addEventListener("online", onOnline);
-    addEventListener("offline", onOffline);
-
-    setGroup(localStorage.getItem("group") || "");
-    setSchedule(JSON.parse(localStorage.getItem("schedule") || "[]"));
-
-    fetch("/api/suggestions")
-      .then((res) => res.json())
-      .then((res) => {
-        setAllSuggestions(res);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (group === "" || !navigator.onLine || !refetch) {
-      return;
-    }
-
-    showSchedule();
-    setRefetch(false);
-  }, [group]);
-
-  function onOnline() {
-    setOffline(false);
-    showSchedule();
-  }
-
-  function onOffline() {
-    setOffline(true);
-  }
-
   function showSchedule(e) {
     e?.preventDefault();
     setWeekDelta(0);
@@ -98,6 +66,41 @@ export default function Home() {
         setLoading(false);
       });
   }
+
+  const showScheduleFunc = useRef();
+  showScheduleFunc.current = showSchedule;
+
+  useEffect(() => {
+    function onOnline() {
+      setOffline(false);
+      showScheduleFunc.current();
+    }
+
+    function onOffline() {
+      setOffline(true);
+    }
+
+    addEventListener("online", onOnline);
+    addEventListener("offline", onOffline);
+
+    setGroup(localStorage.getItem("group") || "");
+    setSchedule(JSON.parse(localStorage.getItem("schedule") || "[]"));
+
+    fetch("/api/suggestions")
+      .then((res) => res.json())
+      .then((res) => {
+        setAllSuggestions(res);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (group === "" || !navigator.onLine || !refetch) {
+      return;
+    }
+
+    showScheduleFunc.current();
+    setRefetch(false);
+  }, [group, refetch]);
 
   function past() {
     setLoading(true);
