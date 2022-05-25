@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Autosuggest from "react-autosuggest";
 import Head from "next/head";
 import startOfWeek from "date-fns/startOfWeek";
@@ -46,7 +46,11 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(true);
 
-  const todayRef = useRef(null);
+  const todayRef = useCallback((node) => {
+    if (node !== null) {
+      node.scrollIntoView();
+    }
+  }, []);
 
   function showSchedule(e) {
     e?.preventDefault();
@@ -94,12 +98,6 @@ export default function Home() {
         setAllSuggestions(res);
       });
   }, []);
-
-  useEffect(() => {
-    if (todayRef.current) {
-      todayRef.current.scrollIntoView();
-    }
-  }, [todayRef.current]);
 
   useEffect(() => {
     if (group === "" || !navigator.onLine || !refetch) {
