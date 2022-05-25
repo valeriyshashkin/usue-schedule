@@ -218,10 +218,11 @@ export default function Home() {
               <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
             </>
           ) : (
-            schedule.map(({ date, pairs, weekDay }, id) => (
+            schedule.map(({ date, pairs, isCurrentDate, weekDay }, id) => (
               <div key={id}>
                 <h3 className="w-full p-4 text-center font-bold">
                   {date} - {weekDay}
+                  {isCurrentDate !== 0 && <span class="badge badge-primary ml-2">Сегодня</span>}
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="table table-compact table-zebra w-full">
