@@ -4,6 +4,11 @@ import Head from "next/head";
 import startOfWeek from "date-fns/startOfWeek";
 import endOfWeek from "date-fns/endOfWeek";
 import format from "date-fns/format";
+import {
+  StatusOfflineIcon,
+  ArrowNarrowLeftIcon,
+  ArrowNarrowRightIcon,
+} from "@heroicons/react/outline";
 
 function getSuggestionValue(s) {
   return s;
@@ -37,10 +42,16 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState([]);
   const [allSuggestions, setAllSuggestions] = useState([]);
   const [weekDelta, setWeekDelta] = useState(0);
+  const [offline, setOffline] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    addEventListener("online", onOnline);
+    addEventListener("offline", onOffline);
+
     setGroup(localStorage.getItem("group") || "");
     setSchedule(JSON.parse(localStorage.getItem("schedule") || "[]"));
+
     fetch("/api/suggestions")
       .then((res) => res.json())
       .then((res) => {
@@ -48,8 +59,18 @@ export default function Home() {
       });
   }, []);
 
-  function showSchedule() {
+  function onOnline() {
+    setOffline(false);
+  }
+
+  function onOffline() {
+    setOffline(true);
+  }
+
+  function showSchedule(e) {
+    e.preventDefault()
     setWeekDelta(0);
+    setLoading(true);
     fetch("/api/schedule", {
       method: "POST",
       body: JSON.stringify({
@@ -63,10 +84,12 @@ export default function Home() {
         localStorage.setItem("group", group);
         localStorage.setItem("schedule", JSON.stringify(res));
         setSchedule(res);
+        setLoading(false);
       });
   }
 
   function past() {
+    setLoading(true);
     setWeekDelta(weekDelta - 1);
 
     fetch("/api/schedule", {
@@ -80,10 +103,12 @@ export default function Home() {
       .then((res) => res.json())
       .then((res) => {
         setSchedule(res);
+        setLoading(false);
       });
   }
 
   function future() {
+    setLoading(true);
     setWeekDelta(weekDelta + 1);
 
     fetch("/api/schedule", {
@@ -97,6 +122,7 @@ export default function Home() {
       .then((res) => res.json())
       .then((res) => {
         setSchedule(res);
+        setLoading(false);
       });
   }
 
@@ -127,93 +153,130 @@ export default function Home() {
   };
 
   return (
-    <div className="mx-auto max-w-screen-lg w-full">
-      <Head>
-        <title>Расписание УрГЭУ</title>
-        <meta name="theme-color" content="#2a303c" />
-        <link rel="manifest" href="/manifest.json" />
-      </Head>
-      <Autosuggest
-        suggestions={suggestions}
-        onSuggestionsFetchRequested={fetchSuggestions}
-        onSuggestionsClearRequested={clearSuggestions}
-        renderSuggestion={renderSuggestion}
-        inputProps={inputProps}
-        getSuggestionValue={getSuggestionValue}
-      />
-      <button
-        className="btn btn-primary w-full mx-4 mt-0"
-        onClick={showSchedule}
-      >
-        Показать расписание
-      </button>
-      <div className="m-4 mt-0 w-full">
-        {schedule.length > 0 && (
-          <div className="btn-group grid grid-cols-2 mt-4 w-full">
-            <button className="btn btn-outline" onClick={past}>
-              Прошлое
-            </button>
-            <button className="btn btn-outline" onClick={future}>
-              Будущее
-            </button>
+    <>
+      {offline && (
+        <>
+          <div className="fixed z-20 w-full flex justify-center items-center bg-gray-700 p-1">
+            <StatusOfflineIcon className="h-5 w-5 mr-2" />
+            Вы не подключены к сети
           </div>
-        )}
-        {schedule.map(({ date, pairs, weekDay }, id) => (
-          <div key={id}>
-            <h3 className="w-full p-4 text-center font-bold">
-              {date} - {weekDay}
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="table table-compact table-zebra w-full">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Время</th>
-                    <th>Предмет</th>
-                    <th>Преподаватель</th>
-                    <th>Аудитория</th>
-                    <th>Группа</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pairs.map(
-                    ({ N, time, isCurrentPair, schedulePairs }, id) =>
-                      time !== "-" && (
-                        <tr key={id}>
-                          <th className={`${isCurrentPair && "!bg-primary"}`}>
-                            {N}
-                          </th>
-                          <td className={`${isCurrentPair && "!bg-primary"}`}>
-                            {time}
-                          </td>
-                          <td className={`${isCurrentPair && "!bg-primary"}`}>
-                            {schedulePairs[0]?.subject}
-                          </td>
-                          <td className={`${isCurrentPair && "!bg-primary"}`}>
-                            {schedulePairs[0]?.teacher}
-                          </td>
-                          <td className={`${isCurrentPair && "!bg-primary"}`}>
-                            {schedulePairs[0]?.aud}
-                          </td>
-                          <td className={`${isCurrentPair && "!bg-primary"}`}>
-                            {schedulePairs[0]?.group}
-                          </td>
-                        </tr>
-                      )
-                  )}
-                </tbody>
-              </table>
+          <div className="h-4 mb-4"></div>
+        </>
+      )}
+      <div className="mx-auto max-w-screen-lg w-full">
+        <Head>
+          <title>Расписание УрГЭУ</title>
+          <meta name="theme-color" content="#2a303c" />
+          <link rel="manifest" href="/manifest.json" />
+        </Head>
+        <form onSubmit={showSchedule}>
+          <Autosuggest
+            suggestions={suggestions}
+            onSuggestionsFetchRequested={fetchSuggestions}
+            onSuggestionsClearRequested={clearSuggestions}
+            renderSuggestion={renderSuggestion}
+            inputProps={inputProps}
+            getSuggestionValue={getSuggestionValue}
+          />
+
+          <button
+            className="btn btn-primary w-full mx-4 mt-0"
+            type="submit"
+          >
+            Показать расписание
+          </button>
+        </form>
+        <div className="m-4 mt-0 w-full">
+          {schedule.length > 0 && (
+            <div className="btn-group grid grid-cols-2 mt-4 w-full">
+              <button className="btn btn-outline" onClick={past}>
+                <ArrowNarrowLeftIcon className="h-6 w-6" />
+              </button>
+              <button className="btn btn-outline" onClick={future}>
+                <ArrowNarrowRightIcon className="h-6 w-6" />
+              </button>
             </div>
-          </div>
-        ))}
-        <a
-          href="https://www.flaticon.com/free-icons/calendar"
-          title="calendar icons"
-          className="link mt-4 mb-6 block text-center"
-        >
-          Calendar icons created by Freepik - Flaticon
-        </a>
+          )}
+          {loading ? (
+            <>
+              <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
+              <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+              <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
+              <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+              <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
+              <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+            </>
+          ) : (
+            schedule.map(({ date, pairs, weekDay }, id) => (
+              <div key={id}>
+                <h3 className="w-full p-4 text-center font-bold">
+                  {date} - {weekDay}
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="table table-compact table-zebra w-full">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Время</th>
+                        <th>Предмет</th>
+                        <th>Преподаватель</th>
+                        <th>Аудитория</th>
+                        <th>Группа</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pairs.map(
+                        ({ N, time, isCurrentPair, schedulePairs }, id) =>
+                          time !== "-" && (
+                            <tr key={id}>
+                              <th
+                                className={`${isCurrentPair && "!bg-primary"}`}
+                              >
+                                {N}
+                              </th>
+                              <td
+                                className={`${isCurrentPair && "!bg-primary"}`}
+                              >
+                                {time}
+                              </td>
+                              <td
+                                className={`${isCurrentPair && "!bg-primary"}`}
+                              >
+                                {schedulePairs[0]?.subject}
+                              </td>
+                              <td
+                                className={`${isCurrentPair && "!bg-primary"}`}
+                              >
+                                {schedulePairs[0]?.teacher}
+                              </td>
+                              <td
+                                className={`${isCurrentPair && "!bg-primary"}`}
+                              >
+                                {schedulePairs[0]?.aud}
+                              </td>
+                              <td
+                                className={`${isCurrentPair && "!bg-primary"}`}
+                              >
+                                {schedulePairs[0]?.group}
+                              </td>
+                            </tr>
+                          )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))
+          )}
+          <a
+            href="https://www.flaticon.com/free-icons/calendar"
+            title="calendar icons"
+            className="link mt-4 mb-6 block text-center"
+          >
+            Calendar icons created by Freepik - Flaticon
+          </a>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
