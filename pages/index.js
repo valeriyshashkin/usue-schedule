@@ -86,6 +86,8 @@ export default function Home() {
       setOffline(true);
     }
 
+    setOffline(!navigator.onLine);
+
     addEventListener("online", onOnline);
     addEventListener("offline", onOffline);
 
@@ -175,13 +177,10 @@ export default function Home() {
   return (
     <>
       {offline && (
-        <>
-          <div className="fixed z-30 w-full flex justify-center items-center bg-gray-900 p-1">
-            <StatusOfflineIcon className="h-5 w-5 mr-2" />
-            Вы не подключены к сети
-          </div>
-          <div className="h-4 mb-4"></div>
-        </>
+        <div className="fixed bottom-0 z-30 w-full flex justify-center items-center bg-gray-900 p-1">
+          <StatusOfflineIcon className="h-5 w-5 mr-2" />
+          Вы не подключены к сети
+        </div>
       )}
       <div className="mx-auto max-w-screen-lg w-full">
         <Head>
@@ -199,17 +198,29 @@ export default function Home() {
             getSuggestionValue={getSuggestionValue}
           />
 
-          <button className="btn btn-primary w-full mx-4 mt-0" type="submit">
+          <button
+            className="btn btn-primary w-full mx-4 mt-0"
+            type="submit"
+            disabled={offline}
+          >
             Показать расписание
           </button>
         </form>
         <div className="m-4 mt-0 w-full">
           {schedule.length > 0 && (
             <div className="btn-group grid grid-cols-2 mt-4 w-full">
-              <button className="btn btn-outline" onClick={past}>
+              <button
+                className="btn btn-outline"
+                onClick={past}
+                disabled={offline}
+              >
                 <ArrowNarrowLeftIcon className="h-6 w-6" />
               </button>
-              <button className="btn btn-outline" onClick={future}>
+              <button
+                className="btn btn-outline"
+                onClick={future}
+                disabled={offline}
+              >
                 <ArrowNarrowRightIcon className="h-6 w-6" />
               </button>
             </div>
@@ -304,6 +315,7 @@ export default function Home() {
           </a>
         </div>
       </div>
+      {offline && <div className="h-4 mb-2"></div>}
     </>
   );
 }
