@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .react-autosuggest__container {
-  @apply relative;
+  @apply relative z-20;
 }
 
 .react-autosuggest__input {

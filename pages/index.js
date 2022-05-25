@@ -44,6 +44,7 @@ export default function Home() {
   const [weekDelta, setWeekDelta] = useState(0);
   const [offline, setOffline] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [refetch, setRefetch] = useState(true);
 
   useEffect(() => {
     addEventListener("online", onOnline);
@@ -59,6 +60,15 @@ export default function Home() {
       });
   }, []);
 
+  useEffect(() => {
+    if (group === "" || !navigator.onLine || !refetch) {
+      return;
+    }
+
+    showSchedule();
+    setRefetch(false);
+  }, [group]);
+
   function onOnline() {
     setOffline(false);
     showSchedule();
@@ -69,7 +79,7 @@ export default function Home() {
   }
 
   function showSchedule(e) {
-    e?.preventDefault()
+    e?.preventDefault();
     setWeekDelta(0);
     setLoading(true);
     fetch("/api/schedule", {
@@ -157,7 +167,7 @@ export default function Home() {
     <>
       {offline && (
         <>
-          <div className="fixed z-20 w-full flex justify-center items-center bg-gray-900 p-1">
+          <div className="fixed z-30 w-full flex justify-center items-center bg-gray-900 p-1">
             <StatusOfflineIcon className="h-5 w-5 mr-2" />
             Вы не подключены к сети
           </div>
@@ -180,10 +190,7 @@ export default function Home() {
             getSuggestionValue={getSuggestionValue}
           />
 
-          <button
-            className="btn btn-primary w-full mx-4 mt-0"
-            type="submit"
-          >
+          <button className="btn btn-primary w-full mx-4 mt-0" type="submit">
             Показать расписание
           </button>
         </form>
