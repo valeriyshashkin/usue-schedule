@@ -7,7 +7,7 @@
 }
 
 .react-autosuggest__input {
-  @apply input bg-gray-700 w-full m-4;
+  @apply input bg-gray-700 w-full m-4 mb-0;
 }
 
 .react-autosuggest__suggestions-container {
