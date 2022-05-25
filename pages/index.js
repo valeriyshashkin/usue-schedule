@@ -222,7 +222,7 @@ export default function Home() {
               <div key={id}>
                 <h3 className="w-full p-4 text-center font-bold">
                   {date} - {weekDay}
-                  {isCurrentDate !== 0 && <span class="badge badge-primary ml-2">Сегодня</span>}
+                  {isCurrentDate !== 0 && <span className="badge badge-primary ml-2">Сегодня</span>}
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="table table-compact table-zebra w-full">
