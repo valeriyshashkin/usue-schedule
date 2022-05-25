@@ -156,7 +156,7 @@ export default function Home() {
     <>
       {offline && (
         <>
-          <div className="fixed z-20 w-full flex justify-center items-center bg-gray-700 p-1">
+          <div className="fixed z-20 w-full flex justify-center items-center bg-gray-900 p-1">
             <StatusOfflineIcon className="h-5 w-5 mr-2" />
             Вы не подключены к сети
           </div>
