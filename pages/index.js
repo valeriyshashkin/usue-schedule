@@ -46,6 +46,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(true);
 
+  const todayRef = useRef(null);
+
   function showSchedule(e) {
     e?.preventDefault();
     setWeekDelta(0);
@@ -92,6 +94,12 @@ export default function Home() {
         setAllSuggestions(res);
       });
   }, []);
+
+  useEffect(() => {
+    if (todayRef.current) {
+      todayRef.current.scrollIntoView();
+    }
+  }, [todayRef.current]);
 
   useEffect(() => {
     if (group === "" || !navigator.onLine || !refetch) {
@@ -220,10 +228,19 @@ export default function Home() {
           ) : (
             schedule.map(({ date, pairs, isCurrentDate, weekDay }, id) => (
               <div key={id}>
-                <h3 className="w-full p-4 text-center font-bold">
-                  {date} - {weekDay}
-                  {isCurrentDate !== 0 && <span className="badge badge-primary ml-2">Сегодня</span>}
-                </h3>
+                {isCurrentDate !== 0 ? (
+                  <h3
+                    ref={todayRef}
+                    className="w-full h-[56px] flex justify-center items-center font-bold"
+                  >
+                    {date} - {weekDay}
+                    <span className="badge badge-primary ml-2">Сегодня</span>
+                  </h3>
+                ) : (
+                  <h3 className="w-full h-[56px] flex justify-center items-center font-bold">
+                    {date} - {weekDay}
+                  </h3>
+                )}
                 <div className="overflow-x-auto">
                   <table className="table table-compact table-zebra w-full">
                     <thead>
