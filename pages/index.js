@@ -61,6 +61,7 @@ export default function Home() {
 
   function onOnline() {
     setOffline(false);
+    showSchedule();
   }
 
   function onOffline() {
@@ -68,7 +69,7 @@ export default function Home() {
   }
 
   function showSchedule(e) {
-    e.preventDefault()
+    e?.preventDefault()
     setWeekDelta(0);
     setLoading(true);
     fetch("/api/schedule", {
