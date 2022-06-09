@@ -13,24 +13,6 @@ function renderSuggestion(s) {
   return s;
 }
 
-function getStartDay(delta) {
-  return format(
-    startOfWeek(Date.now() + 7 * 24 * 60 * 60 * 1000 * delta, {
-      weekStartsOn: 1,
-    }),
-    "dd.MM.yyyy"
-  );
-}
-
-function getEndDay(delta) {
-  return format(
-    endOfWeek(Date.now() + 7 * 24 * 60 * 60 * 1000 * delta, {
-      weekStartsOn: 1,
-    }),
-    "dd.MM.yyyy"
-  );
-}
-
 export default function Home() {
   const [group, setGroup] = useState("");
   const [schedule, setSchedule] = useState([]);
