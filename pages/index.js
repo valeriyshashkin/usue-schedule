@@ -240,7 +240,14 @@ export default function Home() {
                                     isCurrentPair && "!bg-primary"
                                   }`}
                                 >
-                                  {schedulePairs[0]?.teacher}
+                                  {schedulePairs[0] && (
+                                    <a
+                                      className="link"
+                                      href={`//usue.ru/raspisanie/getteams?prepod=${schedulePairs[0].teacher}`}
+                                    >
+                                      {schedulePairs[0].teacher}
+                                    </a>
+                                  )}
                                 </td>
                                 <td
                                   className={`${
