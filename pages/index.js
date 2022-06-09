@@ -24,18 +24,23 @@ export default function Home() {
   const startDateRef = useRef();
   const endDateRef = useRef();
 
-  function showSchedule() {
+  function onSuggestionSelected(e, { suggestionValue }) {
+    setGroup(suggestionValue);
+    showSchedule(suggestionValue);
+  }
+
+  function showSchedule(groupFromSuggestion) {
     fetch("/api/schedule", {
       method: "POST",
       body: JSON.stringify({
         startDate: format(startDateRef.current, "dd.MM.yyyy"),
         endDate: format(endDateRef.current, "dd.MM.yyyy"),
-        group,
+        group: groupFromSuggestion || group,
       }),
     })
       .then((res) => res.json())
       .then((res) => {
-        localStorage.setItem("group", group);
+        localStorage.setItem("group", groupFromSuggestion || group);
         localStorage.setItem("schedule", JSON.stringify(res));
         setSchedule(res);
         setLoading(false);
@@ -145,7 +150,7 @@ export default function Home() {
           inputProps={inputProps}
           getSuggestionValue={getSuggestionValue}
           highlightFirstSuggestion
-          onSuggestionSelected={showSchedule}
+          onSuggestionSelected={onSuggestionSelected}
         />
         <button
           className={`w-full mx-4 mt-4 btn btn-outline !no-underline${
