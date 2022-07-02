@@ -3,10 +3,15 @@ import Head from "next/head";
 import { StatusOfflineIcon } from "@heroicons/react/outline";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { format, add, sub } from "date-fns";
+import { useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+
+const groupAtom = atomWithStorage("group", "");
+const scheduleAtom = atomWithStorage("schedule", []);
 
 export default function Home({ groups }) {
-  const [group, setGroup] = useState("");
-  const [schedule, setSchedule] = useState([]);
+  const [group, setGroup] = useAtom(groupAtom);
+  const [schedule, setSchedule] = useAtom(scheduleAtom);
   const [offline, setOffline] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(true);
@@ -14,19 +19,17 @@ export default function Home({ groups }) {
   const startDateRef = useRef();
   const endDateRef = useRef();
 
-  function showSchedule(groupFromSuggestion) {
+  function showSchedule() {
     fetch("/api/schedule", {
       method: "POST",
       body: JSON.stringify({
         startDate: format(startDateRef.current, "dd.MM.yyyy"),
         endDate: format(endDateRef.current, "dd.MM.yyyy"),
-        group: groupFromSuggestion || group,
+        group,
       }),
     })
       .then((res) => res.json())
       .then((res) => {
-        localStorage.setItem("group", groupFromSuggestion || group);
-        localStorage.setItem("schedule", JSON.stringify(res));
         setSchedule(res);
         setLoading(false);
       });
@@ -54,9 +57,6 @@ export default function Home({ groups }) {
 
     addEventListener("online", onOnline);
     addEventListener("offline", onOffline);
-
-    setGroup(localStorage.getItem("group") || "");
-    setSchedule(JSON.parse(localStorage.getItem("schedule") || "[]"));
   }, []);
 
   useEffect(() => {
@@ -85,11 +85,11 @@ export default function Home({ groups }) {
 
   function handleSelect(e) {
     setGroup(e.target.value);
-    localStorage.setItem("group", e.target.value);
   }
 
   function reset() {
-    localStorage.clear();
+    setGroup("");
+    setSchedule([]);
     location.reload();
   }
 
@@ -154,12 +154,25 @@ export default function Home({ groups }) {
           Показать предыдущие дни
         </button>
         <div className="m-4 mt-0 w-full">
-          <InfiniteScroll
-            dataLength={schedule.length}
-            next={next}
-            hasMore
-            loader={
-              !offline && (
+          {mount && (
+            <InfiniteScroll
+              dataLength={schedule.length}
+              next={next}
+              hasMore
+              loader={
+                !offline && (
+                  <>
+                    <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
+                    <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+                    <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
+                    <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+                    <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
+                    <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+                  </>
+                )
+              }
+            >
+              {loading ? (
                 <>
                   <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
                   <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
@@ -168,96 +181,97 @@ export default function Home({ groups }) {
                   <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
                   <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
                 </>
-              )
-            }
-          >
-            {loading ? (
-              <>
-                <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
-                <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
-                <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
-              </>
-            ) : (
-              schedule.map(({ date, pairs, isCurrentDate, weekDay }, id) => (
-                <div key={id}>
-                  <h3 className="w-full h-[56px] flex justify-center items-center font-bold">
-                    {date} - {weekDay}
-                    {isCurrentDate !== 0 && (
-                      <span className="badge badge-accent ml-2 text-black">
-                        Сегодня
-                      </span>
-                    )}
-                  </h3>
-                  <div className="overflow-x-auto">
-                    <table className="table table-compact table-zebra w-full">
-                      <thead>
-                        <tr>
-                          <th></th>
-                          <th>Время</th>
-                          <th>Предмет</th>
-                          <th>Преподаватель</th>
-                          <th>Аудитория</th>
-                          <th>Группа</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {pairs.map(
-                          ({ N, time, isCurrentPair, schedulePairs }, id) =>
-                            time !== "-" && (
-                              <tr
-                                key={id}
-                                className={`${isCurrentPair && "text-black"}`}
-                              >
-                                <th
-                                  className={`${isCurrentPair && "!bg-accent"}`}
+              ) : (
+                schedule.map(({ date, pairs, isCurrentDate, weekDay }, id) => (
+                  <div key={id}>
+                    <h3 className="w-full h-[56px] flex justify-center items-center font-bold">
+                      {date} - {weekDay}
+                      {isCurrentDate !== 0 && (
+                        <span className="badge badge-accent ml-2 text-black">
+                          Сегодня
+                        </span>
+                      )}
+                    </h3>
+                    <div className="overflow-x-auto">
+                      <table className="table table-compact table-zebra w-full">
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>Время</th>
+                            <th>Предмет</th>
+                            <th>Преподаватель</th>
+                            <th>Аудитория</th>
+                            <th>Группа</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pairs.map(
+                            ({ N, time, isCurrentPair, schedulePairs }, id) =>
+                              time !== "-" && (
+                                <tr
+                                  key={id}
+                                  className={`${isCurrentPair && "text-black"}`}
                                 >
-                                  {N}
-                                </th>
-                                <td
-                                  className={`${isCurrentPair && "!bg-accent"}`}
-                                >
-                                  {time}
-                                </td>
-                                <td
-                                  className={`${isCurrentPair && "!bg-accent"}`}
-                                >
-                                  {schedulePairs[0]?.subject}
-                                </td>
-                                <td
-                                  className={`${isCurrentPair && "!bg-accent"}`}
-                                >
-                                  {schedulePairs[0] && (
-                                    <a
-                                      className="link"
-                                      href={`//usue.ru/raspisanie/getteams?prepod=${schedulePairs[0].teacher}`}
-                                    >
-                                      {schedulePairs[0].teacher}
-                                    </a>
-                                  )}
-                                </td>
-                                <td
-                                  className={`${isCurrentPair && "!bg-accent"}`}
-                                >
-                                  {schedulePairs[0]?.aud}
-                                </td>
-                                <td
-                                  className={`${isCurrentPair && "!bg-accent"}`}
-                                >
-                                  {schedulePairs[0]?.group}
-                                </td>
-                              </tr>
-                            )
-                        )}
-                      </tbody>
-                    </table>
+                                  <th
+                                    className={`${
+                                      isCurrentPair && "!bg-accent"
+                                    }`}
+                                  >
+                                    {N}
+                                  </th>
+                                  <td
+                                    className={`${
+                                      isCurrentPair && "!bg-accent"
+                                    }`}
+                                  >
+                                    {time}
+                                  </td>
+                                  <td
+                                    className={`${
+                                      isCurrentPair && "!bg-accent"
+                                    }`}
+                                  >
+                                    {schedulePairs[0]?.subject}
+                                  </td>
+                                  <td
+                                    className={`${
+                                      isCurrentPair && "!bg-accent"
+                                    }`}
+                                  >
+                                    {schedulePairs[0] && (
+                                      <a
+                                        className="link"
+                                        href={`//usue.ru/raspisanie/getteams?prepod=${schedulePairs[0].teacher}`}
+                                      >
+                                        {schedulePairs[0].teacher}
+                                      </a>
+                                    )}
+                                  </td>
+                                  <td
+                                    className={`${
+                                      isCurrentPair && "!bg-accent"
+                                    }`}
+                                  >
+                                    {schedulePairs[0]?.aud}
+                                  </td>
+                                  <td
+                                    className={`${
+                                      isCurrentPair && "!bg-accent"
+                                    }`}
+                                  >
+                                    {schedulePairs[0]?.group}
+                                  </td>
+                                </tr>
+                              )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-          </InfiniteScroll>
+                ))
+              )}
+            </InfiniteScroll>
+          )}
         </div>
       </div>
       {offline && <div className="h-4 mb-2"></div>}
