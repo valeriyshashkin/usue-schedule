@@ -10,6 +10,7 @@ export default function Home({ groups }) {
   const [offline, setOffline] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(true);
+  const [mount, setMount] = useState(false);
   const startDateRef = useRef();
   const endDateRef = useRef();
 
@@ -35,6 +36,8 @@ export default function Home({ groups }) {
   showScheduleFunc.current = showSchedule;
 
   useEffect(() => {
+    setMount(true);
+
     startDateRef.current = Date.now();
     endDateRef.current = add(Date.now(), { days: 7 });
 
@@ -104,7 +107,7 @@ export default function Home({ groups }) {
           <meta name="theme-color" content="#2a303c" />
           <link rel="manifest" href="/manifest.json" />
         </Head>
-        {!group && (
+        {mount && !group && (
           <>
             <input
               type="checkbox"
