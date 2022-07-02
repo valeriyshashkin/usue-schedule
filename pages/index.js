@@ -1,33 +1,17 @@
 import { useState, useEffect, useRef } from "react";
-import Autosuggest from "react-autosuggest";
 import Head from "next/head";
 import { StatusOfflineIcon } from "@heroicons/react/outline";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { format, add, sub } from "date-fns";
 
-function getSuggestionValue(s) {
-  return s;
-}
-
-function renderSuggestion(s) {
-  return s;
-}
-
-export default function Home() {
+export default function Home({ groups }) {
   const [group, setGroup] = useState("");
   const [schedule, setSchedule] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
-  const [allSuggestions, setAllSuggestions] = useState([]);
   const [offline, setOffline] = useState(false);
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(true);
   const startDateRef = useRef();
   const endDateRef = useRef();
-
-  function onSuggestionSelected(e, { suggestionValue }) {
-    setGroup(suggestionValue);
-    showSchedule(suggestionValue);
-  }
 
   function showSchedule(groupFromSuggestion) {
     fetch("/api/schedule", {
@@ -70,12 +54,6 @@ export default function Home() {
 
     setGroup(localStorage.getItem("group") || "");
     setSchedule(JSON.parse(localStorage.getItem("schedule") || "[]"));
-
-    fetch("/api/suggestions")
-      .then((res) => res.json())
-      .then((res) => {
-        setAllSuggestions(res);
-      });
   }, []);
 
   useEffect(() => {
@@ -86,32 +64,6 @@ export default function Home() {
     showScheduleFunc.current();
     setRefetch(false);
   }, [group, refetch]);
-
-  function handleChange(e, { newValue }) {
-    setGroup(newValue);
-  }
-
-  function fetchSuggestions({ value }) {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-
-    setSuggestions(
-      inputLength === 0
-        ? []
-        : allSuggestions.filter(
-            (s) => s.toLowerCase().slice(0, inputLength) === inputValue
-          )
-    );
-  }
-
-  function clearSuggestions() {
-    setSuggestions([]);
-  }
-
-  const inputProps = {
-    value: group,
-    onChange: handleChange,
-  };
 
   function next() {
     if (offline) {
@@ -128,6 +80,16 @@ export default function Home() {
     showSchedule();
   }
 
+  function handleSelect(e) {
+    setGroup(e.target.value);
+    localStorage.setItem("group", e.target.value);
+  }
+
+  function reset() {
+    localStorage.clear();
+    location.reload();
+  }
+
   return (
     <>
       {offline && (
@@ -136,24 +98,51 @@ export default function Home() {
           Вы не подключены к сети
         </div>
       )}
-      <div className="mx-auto max-w-screen-lg w-full">
+      <div className="mx-auto max-w-screen-md w-full">
         <Head>
-          <title>Расписание УрГЭУ</title>
+          <title>ush</title>
           <meta name="theme-color" content="#2a303c" />
           <link rel="manifest" href="/manifest.json" />
         </Head>
-        <Autosuggest
-          suggestions={suggestions}
-          onSuggestionsFetchRequested={fetchSuggestions}
-          onSuggestionsClearRequested={clearSuggestions}
-          renderSuggestion={renderSuggestion}
-          inputProps={inputProps}
-          getSuggestionValue={getSuggestionValue}
-          highlightFirstSuggestion
-          onSuggestionSelected={onSuggestionSelected}
-        />
+        {!group && (
+          <>
+            <input
+              type="checkbox"
+              id="select-group"
+              defaultChecked
+              className="modal-toggle"
+            />
+            <div className="modal modal-middle">
+              <div className="modal-box">
+                <h3 className="font-bold text-4xl text-center">Привет</h3>
+                <div className="modal-action">
+                  <select
+                    className="select select-bordered w-full mx-auto max-w-xs"
+                    onChange={handleSelect}
+                    defaultValue=""
+                  >
+                    <option disabled value="">
+                      В какой ты группе?
+                    </option>
+                    {groups.map((g, i) => (
+                      <option value={g} key={i}>
+                        {g}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+        <div className="w-full mt-4 flex mx-4 justify-between items-center">
+          <h1 className="font-bold text-2xl">ush</h1>
+          <span className="text-sm cursor-pointer" onClick={reset}>
+            Сбросить группу
+          </span>
+        </div>
         <button
-          className={`w-full mx-4 mt-4 btn btn-outline !no-underline${
+          className={`w-full mx-4 mt-4 btn btn-accent text-black !no-underline${
             loading && " loading"
           }`}
           onClick={prev}
@@ -194,7 +183,9 @@ export default function Home() {
                   <h3 className="w-full h-[56px] flex justify-center items-center font-bold">
                     {date} - {weekDay}
                     {isCurrentDate !== 0 && (
-                      <span className="badge badge-primary ml-2">Сегодня</span>
+                      <span className="badge badge-accent ml-2 text-black">
+                        Сегодня
+                      </span>
                     )}
                   </h3>
                   <div className="overflow-x-auto">
@@ -213,32 +204,27 @@ export default function Home() {
                         {pairs.map(
                           ({ N, time, isCurrentPair, schedulePairs }, id) =>
                             time !== "-" && (
-                              <tr key={id}>
+                              <tr
+                                key={id}
+                                className={`${isCurrentPair && "text-black"}`}
+                              >
                                 <th
-                                  className={`${
-                                    isCurrentPair && "!bg-primary"
-                                  }`}
+                                  className={`${isCurrentPair && "!bg-accent"}`}
                                 >
                                   {N}
                                 </th>
                                 <td
-                                  className={`${
-                                    isCurrentPair && "!bg-primary"
-                                  }`}
+                                  className={`${isCurrentPair && "!bg-accent"}`}
                                 >
                                   {time}
                                 </td>
                                 <td
-                                  className={`${
-                                    isCurrentPair && "!bg-primary"
-                                  }`}
+                                  className={`${isCurrentPair && "!bg-accent"}`}
                                 >
                                   {schedulePairs[0]?.subject}
                                 </td>
                                 <td
-                                  className={`${
-                                    isCurrentPair && "!bg-primary"
-                                  }`}
+                                  className={`${isCurrentPair && "!bg-accent"}`}
                                 >
                                   {schedulePairs[0] && (
                                     <a
@@ -250,16 +236,12 @@ export default function Home() {
                                   )}
                                 </td>
                                 <td
-                                  className={`${
-                                    isCurrentPair && "!bg-primary"
-                                  }`}
+                                  className={`${isCurrentPair && "!bg-accent"}`}
                                 >
                                   {schedulePairs[0]?.aud}
                                 </td>
                                 <td
-                                  className={`${
-                                    isCurrentPair && "!bg-primary"
-                                  }`}
+                                  className={`${isCurrentPair && "!bg-accent"}`}
                                 >
                                   {schedulePairs[0]?.group}
                                 </td>
@@ -273,16 +255,22 @@ export default function Home() {
               ))
             )}
           </InfiniteScroll>
-          <a
-            href="https://www.flaticon.com/free-icons/calendar"
-            title="calendar icons"
-            className="link mt-4 mb-6 block text-center"
-          >
-            Calendar icons created by Freepik - Flaticon
-          </a>
         </div>
       </div>
       {offline && <div className="h-4 mb-2"></div>}
     </>
   );
+}
+
+export async function getStaticProps() {
+  const response = await fetch(
+    "https://www.usue.ru/schedule/?action=group-list"
+  );
+
+  const groups = await response.json();
+
+  return {
+    props: { groups },
+    revalidate: 60 * 60 * 24 * 7,
+  };
 }
