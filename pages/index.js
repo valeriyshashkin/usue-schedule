@@ -140,7 +140,7 @@ export default function Home({ groups }) {
         )}
         <div className="w-full mt-4 flex mx-4 justify-between items-center">
           <h1 className="font-bold text-2xl">ush</h1>
-          <span className="text-sm cursor-pointer" onClick={reset}>
+          <span className="text-sm cursor-pointer select-none" onClick={reset}>
             Сбросить группу
           </span>
         </div>
