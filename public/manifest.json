@@ -1,6 +1,6 @@
 {
-  "name": "Расписание УрГЭУ",
-  "short_name": "Расписание",
+  "name": "ush",
+  "short_name": "ush",
   "theme_color": "#2a303c",
   "background_color": "#2a303c",
   "display": "standalone",
