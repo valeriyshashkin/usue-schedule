@@ -145,7 +145,7 @@ export default function Home({ groups }) {
           </span>
         </div>
         <button
-          className={`w-full mx-4 mt-4 btn btn-accent text-black !no-underline${
+          className={`w-full mx-4 mt-4 btn btn-primary text-black !no-underline${
             loading && " loading"
           }`}
           onClick={prev}
@@ -162,24 +162,24 @@ export default function Home({ groups }) {
               loader={
                 !offline && (
                   <>
-                    <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                    <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
-                    <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                    <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
-                    <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                    <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+                    <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
+                    <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
+                    <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
+                    <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
+                    <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
+                    <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
                   </>
                 )
               }
             >
               {loading ? (
                 <>
-                  <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                  <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
-                  <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                  <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
-                  <div className="mt-4 p-4 bg-gray-700 h-[24px] rounded-lg"></div>
-                  <div className="mt-4 bg-gray-700 h-[316px] rounded-lg"></div>
+                  <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
+                  <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
+                  <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
+                  <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
+                  <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
+                  <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
                 </>
               ) : (
                 schedule.map(({ date, pairs, isCurrentDate, weekDay }, id) => (
@@ -187,7 +187,7 @@ export default function Home({ groups }) {
                     <h3 className="w-full h-[56px] flex justify-center items-center font-bold">
                       {date} - {weekDay}
                       {isCurrentDate !== 0 && (
-                        <span className="badge badge-accent ml-2 text-black">
+                        <span className="badge badge-primary ml-2 text-black">
                           Сегодня
                         </span>
                       )}
@@ -214,28 +214,28 @@ export default function Home({ groups }) {
                                 >
                                   <th
                                     className={`${
-                                      isCurrentPair && "!bg-accent"
+                                      isCurrentPair && "!bg-primary"
                                     }`}
                                   >
                                     {N}
                                   </th>
                                   <td
                                     className={`${
-                                      isCurrentPair && "!bg-accent"
+                                      isCurrentPair && "!bg-primary"
                                     }`}
                                   >
                                     {time}
                                   </td>
                                   <td
                                     className={`${
-                                      isCurrentPair && "!bg-accent"
+                                      isCurrentPair && "!bg-primary"
                                     }`}
                                   >
                                     {schedulePairs[0]?.subject}
                                   </td>
                                   <td
                                     className={`${
-                                      isCurrentPair && "!bg-accent"
+                                      isCurrentPair && "!bg-primary"
                                     }`}
                                   >
                                     {schedulePairs[0] && (
@@ -249,14 +249,14 @@ export default function Home({ groups }) {
                                   </td>
                                   <td
                                     className={`${
-                                      isCurrentPair && "!bg-accent"
+                                      isCurrentPair && "!bg-primary"
                                     }`}
                                   >
                                     {schedulePairs[0]?.aud}
                                   </td>
                                   <td
                                     className={`${
-                                      isCurrentPair && "!bg-accent"
+                                      isCurrentPair && "!bg-primary"
                                     }`}
                                   >
                                     {schedulePairs[0]?.group}
