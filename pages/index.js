@@ -101,7 +101,7 @@ export default function Home({ groups }) {
           Вы не подключены к сети
         </div>
       )}
-      <div className="mx-auto max-w-screen-lg w-full">
+      <div className="mx-auto max-w-screen-xl w-full">
         <Head>
           <title>ush</title>
           <meta name="theme-color" content="#2a303c" />
