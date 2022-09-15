@@ -5,6 +5,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { format, add, sub } from "date-fns";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import classNames from "classnames";
 
 const groupAtom = atomWithStorage("group", "");
 const scheduleAtom = atomWithStorage("schedule", []);
@@ -16,6 +17,7 @@ export default function Home({ groups }) {
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(true);
   const [mount, setMount] = useState(false);
+  const [groupInput, setGroupInput] = useState("");
   const startDateRef = useRef();
   const endDateRef = useRef();
 
@@ -83,18 +85,26 @@ export default function Home({ groups }) {
     showSchedule();
   }
 
-  function handleSelect(e) {
-    setGroup(e.target.value);
-  }
-
   function reset() {
     setGroup("");
     setSchedule([]);
-    location.reload();
+  }
+
+  function changeGroup(e) {
+    setGroupInput(e.target.value);
+  }
+
+  function rememberGroup() {
+    setGroup(groupInput);
   }
 
   return (
     <>
+      <Head>
+        <title>ush</title>
+        <meta name="theme-color" content="#2a303c" />
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
       {offline && (
         <div className="fixed bottom-0 z-30 w-full flex justify-center items-center bg-gray-900 p-1">
           <StatusOfflineIcon className="h-5 w-5 mr-2" />
@@ -102,192 +112,143 @@ export default function Home({ groups }) {
         </div>
       )}
       <div className="mx-auto max-w-screen-md w-full">
-        <Head>
-          <title>ush</title>
-          <meta name="theme-color" content="#2a303c" />
-          <link rel="manifest" href="/manifest.json" />
-        </Head>
-        {mount && !group && (
-          <>
-            <input
-              type="checkbox"
-              id="select-group"
-              defaultChecked
-              className="modal-toggle"
-            />
-            <div className="modal modal-middle">
-              <div className="modal-box">
-                <h3 className="font-bold text-4xl text-center">Привет</h3>
-                <div className="modal-action">
-                  <select
-                    className="select select-bordered w-full mx-auto max-w-xs"
-                    onChange={handleSelect}
-                    defaultValue=""
-                  >
-                    <option disabled value="">
-                      В какой ты группе?
-                    </option>
-                    {groups.map((g, i) => (
-                      <option value={g} key={i}>
-                        {g}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-        <div className="w-full mt-4 flex mx-4 justify-between items-center">
+        <div className="w-full mt-4 px-2 flex justify-between items-center">
           <h1 className="font-bold text-2xl">ush</h1>
-          <span className="text-sm cursor-pointer select-none" onClick={reset}>
+          <span
+            className="text-sm cursor-pointer select-none text-blue-500"
+            onClick={reset}
+          >
             Сбросить группу
           </span>
         </div>
-        <button
-          className={`w-full mx-4 mt-4 btn btn-primary text-black !no-underline${
-            loading && " loading"
-          }`}
-          onClick={prev}
-          disabled={offline}
-        >
-          Показать предыдущие дни
-        </button>
-        <div className="m-4 mt-0 w-full">
-          {mount && (
-            <InfiniteScroll
-              dataLength={schedule.length}
-              next={next}
-              hasMore
-              loader={
-                !offline && (
-                  <>
-                    <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
-                    <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
-                    <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
-                    <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
-                    <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
-                    <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
-                  </>
-                )
-              }
-            >
-              {loading ? (
-                <>
-                  <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
-                  <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
-                  <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
-                  <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
-                  <div className="mt-4 p-4 bg-neutral h-[24px] rounded-lg"></div>
-                  <div className="mt-4 bg-neutral h-[316px] rounded-lg"></div>
-                </>
-              ) : (
-                schedule.map(({ date, pairs, isCurrentDate, weekDay }, id) => (
-                  <div key={id}>
-                    <h3 className="w-full h-[56px] flex justify-center items-center font-bold">
-                      {date} - {weekDay}
-                      {isCurrentDate !== 0 && (
-                        <span className="badge badge-primary ml-2 text-black">
-                          Сегодня
-                        </span>
-                      )}
-                    </h3>
-                    <div className="overflow-x-auto">
-                      <table className="table table-compact table-zebra w-full">
-                        <thead>
-                          <tr>
-                            <th></th>
-                            <th>Время</th>
-                            <th>Предмет</th>
-                            <th>Преподаватель</th>
-                            <th>Аудитория</th>
-                            <th>Группа</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {pairs.map(
-                            ({ N, time, isCurrentPair, schedulePairs }, id) =>
-                              time !== "-" && (
-                                <tr
-                                  key={id}
-                                  className={`${isCurrentPair && "text-black"}`}
-                                >
-                                  <th
-                                    className={`${
-                                      isCurrentPair && "!bg-primary"
-                                    }`}
-                                  >
-                                    {N}
-                                  </th>
-                                  <td
-                                    className={`${
-                                      isCurrentPair && "!bg-primary"
-                                    }`}
-                                  >
-                                    {time}
-                                  </td>
-                                  <td
-                                    className={`${
-                                      isCurrentPair && "!bg-primary"
-                                    }`}
-                                  >
-                                    {schedulePairs[0]?.subject}
-                                  </td>
-                                  <td
-                                    className={`${
-                                      isCurrentPair && "!bg-primary"
-                                    }`}
-                                  >
-                                    {schedulePairs[0] && (
-                                      <a
-                                        className="link"
-                                        href={`//usue.ru/raspisanie/getteams?prepod=${schedulePairs[0].teacher}`}
-                                      >
-                                        {schedulePairs[0].teacher}
-                                      </a>
-                                    )}
-                                  </td>
-                                  <td
-                                    className={`${
-                                      isCurrentPair && "!bg-primary"
-                                    }`}
-                                  >
-                                    {schedulePairs[0]?.aud}
-                                  </td>
-                                  <td
-                                    className={`${
-                                      isCurrentPair && "!bg-primary"
-                                    }`}
-                                  >
-                                    {schedulePairs[0]?.group}
-                                  </td>
-                                </tr>
-                              )
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ))
-              )}
-            </InfiniteScroll>
-          )}
-        </div>
+        {mount &&
+          (!group ? (
+            <div className="text-center px-4">
+              <div className="text-xl mt-20 mb-6">
+                Напиши свою группу так, как ты пишешь ее в расписании на сайте
+                УрГЭУ
+              </div>
+              <input
+                onChange={changeGroup}
+                className="text-lg rounded-xl py-2 px-4"
+              />
+              <div>
+                <button
+                  onClick={rememberGroup}
+                  className="bg-blue-500 rounded-xl text-lg py-2 px-4 mt-6"
+                >
+                  Запомнить группу
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="px-2">
+                <button
+                  className={classNames(
+                    "w-full mt-4 py-2 text-md border-blue-500 border text-blue-500 rounded-xl",
+                    {
+                      "bg-neutral-800 border-neutral-800 text-neutral-500":
+                        loading,
+                    }
+                  )}
+                  onClick={prev}
+                  disabled={offline || loading}
+                >
+                  Показать предыдущие дни
+                </button>
+              </div>
+              <div className="mt-0 w-full px-2">
+                {mount && (
+                  <InfiniteScroll
+                    dataLength={schedule.length}
+                    next={next}
+                    hasMore
+                    loader={
+                      !offline && (
+                        <>
+                          <div className="mt-4 p-4 bg-neutral-800 h-[24px] rounded-lg"></div>
+                          <div className="mt-4 bg-neutral-800 h-[316px] rounded-lg"></div>
+                          <div className="mt-4 p-4 bg-neutral-800 h-[24px] rounded-lg"></div>
+                          <div className="mt-4 bg-neutral-800 h-[316px] rounded-lg"></div>
+                          <div className="mt-4 p-4 bg-neutral-800 h-[24px] rounded-lg"></div>
+                          <div className="mt-4 bg-neutral-800 h-[316px] rounded-lg"></div>
+                        </>
+                      )
+                    }
+                  >
+                    {loading ? (
+                      <>
+                        <div className="mt-4 p-4 bg-neutral-800 h-[24px] rounded-lg"></div>
+                        <div className="mt-4 bg-neutral-800 h-[316px] rounded-lg"></div>
+                        <div className="mt-4 p-4 bg-neutral-800 h-[24px] rounded-lg"></div>
+                        <div className="mt-4 bg-neutral-800 h-[316px] rounded-lg"></div>
+                        <div className="mt-4 p-4 bg-neutral-800 h-[24px] rounded-lg"></div>
+                        <div className="mt-4 bg-neutral-800 h-[316px] rounded-lg"></div>
+                      </>
+                    ) : (
+                      schedule.map(
+                        ({ date, pairs, isCurrentDate, weekDay }, id) => (
+                          <div key={id}>
+                            {pairs.filter((p) => p.schedulePairs[0]).length !==
+                              0 && (
+                              <div key={id}>
+                                <h3 className="w-full h-[56px] flex justify-center items-center">
+                                  {date} - {weekDay}
+                                  {isCurrentDate !== 0 && (
+                                    <span className="bg-blue-500 text-sm ml-2 px-2 rounded-xl">
+                                      Сегодня
+                                    </span>
+                                  )}
+                                </h3>
+                                <div className="divide-y divide-gray-500">
+                                  {pairs.map(
+                                    (
+                                      { time, isCurrentPair, schedulePairs },
+                                      id
+                                    ) =>
+                                      time !== "-" &&
+                                      schedulePairs[0]?.subject && (
+                                        <div
+                                          key={id}
+                                          className={classNames("py-2", {
+                                            "bg-blue-500": isCurrentPair,
+                                          })}
+                                        >
+                                          <div>{time}</div>
+                                          <div>{schedulePairs[0]?.subject}</div>
+                                          <div className="text-gray-500">
+                                            {schedulePairs[0] && (
+                                              <a
+                                                href={`//usue.ru/raspisanie/getteams?prepod=${schedulePairs[0].teacher}`}
+                                              >
+                                                {schedulePairs[0].teacher}
+                                              </a>
+                                            )}
+                                          </div>
+                                          <div className="text-gray-500">
+                                            {schedulePairs[0]?.aud}
+                                          </div>
+                                          <div className="text-gray-500">
+                                            {schedulePairs[0]?.group}
+                                          </div>
+                                        </div>
+                                      )
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      )
+                    )}
+                  </InfiniteScroll>
+                )}
+              </div>
+            </>
+          ))}
       </div>
       {offline && <div className="h-4 mb-2"></div>}
     </>
   );
-}
-
-export async function getStaticProps() {
-  const response = await fetch(
-    "https://www.usue.ru/schedule/?action=group-list"
-  );
-
-  const groups = await response.json();
-
-  return {
-    props: { groups },
-    revalidate: 60 * 60 * 24 * 7,
-  };
 }
