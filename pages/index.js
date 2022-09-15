@@ -149,7 +149,7 @@ export default function Home({ groups }) {
                     "w-full mt-4 py-2 text-md border-blue-500 border text-blue-500 rounded-xl",
                     {
                       "bg-neutral-800 border-neutral-800 text-neutral-500":
-                        loading,
+                        offline || loading,
                     }
                   )}
                   onClick={prev}
