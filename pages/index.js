@@ -79,12 +79,6 @@ export default function Home({ groups }) {
     showSchedule();
   }
 
-  function prev() {
-    setLoading(true);
-    startDateRef.current = sub(startDateRef.current, { days: 7 });
-    showSchedule();
-  }
-
   function reset() {
     setGroup("");
     setSchedule([]);
@@ -143,21 +137,6 @@ export default function Home({ groups }) {
             </div>
           ) : (
             <>
-              <div className="px-2">
-                <button
-                  className={classNames(
-                    "w-full mt-4 py-2 text-md border-blue-500 border text-blue-500 rounded-xl",
-                    {
-                      "bg-neutral-800 border-neutral-800 text-neutral-500":
-                        offline || loading,
-                    }
-                  )}
-                  onClick={prev}
-                  disabled={offline || loading}
-                >
-                  Показать предыдущие дни
-                </button>
-              </div>
               <div className="mt-0 w-full px-2">
                 {mount && (
                   <InfiniteScroll
@@ -195,11 +174,6 @@ export default function Home({ groups }) {
                               <div key={id}>
                                 <h3 className="w-full h-[56px] flex justify-center items-center">
                                   {date} - {weekDay}
-                                  {isCurrentDate !== 0 && (
-                                    <span className="bg-blue-500 text-sm ml-2 px-2 rounded-xl">
-                                      Сегодня
-                                    </span>
-                                  )}
                                 </h3>
                                 <div className="divide-y divide-gray-500">
                                   {pairs.map(
@@ -209,12 +183,7 @@ export default function Home({ groups }) {
                                     ) =>
                                       time !== "-" &&
                                       schedulePairs[0]?.subject && (
-                                        <div
-                                          key={id}
-                                          className={classNames("py-2", {
-                                            "bg-blue-500": isCurrentPair,
-                                          })}
-                                        >
+                                        <div key={id} className="py-2">
                                           <div>{time}</div>
                                           <div>{schedulePairs[0]?.subject}</div>
                                           <div className="text-gray-500">
