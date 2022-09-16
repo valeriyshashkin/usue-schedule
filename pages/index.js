@@ -5,7 +5,6 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { format, add, sub } from "date-fns";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import classNames from "classnames";
 
 const groupAtom = atomWithStorage("group", "");
 const scheduleAtom = atomWithStorage("schedule", []);
@@ -167,7 +166,7 @@ export default function Home({ groups }) {
                       </>
                     ) : (
                       schedule.map(
-                        ({ date, pairs, isCurrentDate, weekDay }, id) => (
+                        ({ date, pairs, weekDay }, id) => (
                           <div key={id}>
                             {pairs.filter((p) => p.schedulePairs[0]).length !==
                               0 && (
@@ -178,7 +177,7 @@ export default function Home({ groups }) {
                                 <div className="divide-y divide-gray-500">
                                   {pairs.map(
                                     (
-                                      { time, isCurrentPair, schedulePairs },
+                                      { time, schedulePairs },
                                       id
                                     ) =>
                                       time !== "-" &&
