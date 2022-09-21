@@ -13,7 +13,7 @@ export default function Home() {
 
   function rememberGroup() {
     Cookies.set("group", encodeURI(group));
-    router.push(`/${encodeURI(group)}`);
+    router.push(`/${group}`);
   }
 
   return (

@@ -93,7 +93,7 @@ export async function getStaticProps({ params }) {
       `https://www.usue.ru/schedule/?action=show&startDate=${format(
         startDate,
         "dd.MM.yyyy"
-      )}&endDate=${format(endDate, "dd.MM.yyyy")}&group=${decodeURI(group)}`
+      )}&endDate=${format(endDate, "dd.MM.yyyy")}&group=${group}`
     )
   ).json();
 
