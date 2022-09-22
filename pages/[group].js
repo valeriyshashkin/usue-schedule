@@ -88,7 +88,12 @@ export async function getServerSideProps({ params, res }) {
     )
   ).json();
 
+  res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=10, stale-while-revalidate=59"
+  );
+
   return {
-    props: { schedule, group },
+    props: { schedule, group: decodeURIComponent(group) },
   };
 }
