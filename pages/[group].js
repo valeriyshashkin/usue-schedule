@@ -11,6 +11,10 @@ export default function Group({ schedule, group }) {
     router.push("/");
   }
 
+  if (router.isFallback) {
+    return null;
+  }
+
   return (
     <>
       <Head>
@@ -79,7 +83,7 @@ export async function getStaticPaths() {
 
   return {
     paths: paths.map((group) => ({ params: { group } })),
-    fallback: false,
+    fallback: true,
   };
 }
 
@@ -96,6 +100,10 @@ export async function getStaticProps({ params }) {
       )}&endDate=${format(endDate, "dd.MM.yyyy")}&group=${group}`
     )
   ).json();
+
+  if (!schedule) {
+    return { notFound: true };
+  }
 
   return {
     props: { schedule, group },
