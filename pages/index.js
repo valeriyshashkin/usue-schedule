@@ -12,7 +12,7 @@ export default function Home() {
   }
 
   function rememberGroup() {
-    Cookies.set("group", encodeURIComponent(group));
+    Cookies.set("group", encodeURIComponent(group), { expires: 365 });
     router.push(`/${encodeURIComponent(group)}`);
   }
 

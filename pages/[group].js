@@ -11,6 +11,10 @@ export default function Group({ schedule, group }) {
     router.push("/");
   }
 
+  if (router.isFallback) {
+    return null;
+  }
+
   return (
     <>
       <Head>
@@ -72,7 +76,14 @@ export default function Group({ schedule, group }) {
   );
 }
 
-export async function getServerSideProps({ params, res }) {
+export async function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: true,
+  };
+}
+
+export async function getStaticProps({ params }) {
   const { group } = params;
   const startDate = Date.now();
   const endDate = add(startDate, { months: 1 });
@@ -82,18 +93,16 @@ export async function getServerSideProps({ params, res }) {
       `https://www.usue.ru/schedule/?action=show&startDate=${format(
         startDate,
         "dd.MM.yyyy"
-      )}&endDate=${format(endDate, "dd.MM.yyyy")}&group=${decodeURIComponent(
-        group
-      )}`
+      )}&endDate=${format(endDate, "dd.MM.yyyy")}&group=${group}`
     )
   ).json();
 
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=10, stale-while-revalidate=59"
-  );
+  if (!schedule) {
+    return { notFound: true };
+  }
 
   return {
-    props: { schedule, group: decodeURIComponent(group) },
+    props: { schedule, group },
+    revalidate: 60 * 60 * 6,
   };
 }
