@@ -12,8 +12,8 @@ export default function Home() {
   }
 
   function rememberGroup() {
-    Cookies.set("group", encodeURI(group));
-    router.push(`/${group}`);
+    Cookies.set("group", encodeURIComponent(group));
+    router.push(`/${encodeURIComponent(group)}`);
   }
 
   return (
