@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
+import slugify from "slugify";
 
 export default function Home() {
   const [group, setGroup] = useState("");
@@ -12,8 +13,8 @@ export default function Home() {
   }
 
   function rememberGroup() {
-    Cookies.set("group", encodeURIComponent(group), { expires: 365 });
-    router.push(`/${encodeURIComponent(group)}`);
+    Cookies.set("group", group, { expires: 365 });
+    router.push(`/${slugify(group).toLowerCase()}`);
   }
 
   return (

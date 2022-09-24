@@ -2,6 +2,7 @@ import Head from "next/head";
 import { format, add } from "date-fns";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
+import slugify from "slugify";
 
 export default function Group({ schedule, group }) {
   const router = useRouter();
@@ -84,9 +85,22 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const { group } = params;
+  const { slug } = params;
+
+  const groups = await (
+    await fetch("https://www.usue.ru/schedule/?action=group-list")
+  ).json();
+
+  const slugifiedGroups = groups.map((g) => slugify(g).toLowerCase());
+
+  if (!slugifiedGroups.includes(slug)) {
+    return { notFound: true };
+  }
+
   const startDate = Date.now();
   const endDate = add(startDate, { months: 1 });
+
+  const group = groups[slugifiedGroups.findIndex((g) => g === slug)];
 
   const schedule = await (
     await fetch(
@@ -96,10 +110,6 @@ export async function getStaticProps({ params }) {
       )}&endDate=${format(endDate, "dd.MM.yyyy")}&group=${group}`
     )
   ).json();
-
-  if (!schedule) {
-    return { notFound: true };
-  }
 
   return {
     props: { schedule, group },
