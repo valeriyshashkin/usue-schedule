@@ -29,7 +29,7 @@ export default function Group({ schedule, group }) {
             className="text-sm cursor-pointer select-none text-blue-500"
             onClick={reset}
           >
-            Сбросить группу
+            Изменить группу
           </span>
         </div>
         <div className="mt-0 w-full px-4">
