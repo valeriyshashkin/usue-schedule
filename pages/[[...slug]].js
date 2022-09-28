@@ -87,6 +87,7 @@ export default function Group({ schedule, group, teacher }) {
               </button>
               <div className="relative ml-4 w-full">
                 <input
+                  autoFocus
                   value={query}
                   onChange={changeQuery}
                   className="px-2 py-1 w-full pr-10"
@@ -109,7 +110,7 @@ export default function Group({ schedule, group, teacher }) {
               ))}
             </div>
           </div>
-        ) : group || teacher ? (
+        ) : schedule ? (
           <div className="mt-0 w-full px-4">
             {schedule.map(({ date, pairs, weekDay }, id) => (
               <div key={id}>
