@@ -27,7 +27,7 @@ export default function Page({ homepage, children }) {
 
   return (
     <Content>
-      <Header homepage={homepage} onSearchClick={showSearch} />
+      <Header loading={!data} homepage={homepage} onSearchClick={showSearch} />
       {search ? <Search fuse={fuse} onBackClick={hideSearch} /> : children}
     </Content>
   );
