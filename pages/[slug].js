@@ -2,22 +2,11 @@ import Head from "next/head";
 import { format, add } from "date-fns";
 import { useRouter } from "next/router";
 import slugify from "slugify";
-import { useState } from "react";
-import Header from "../components/Header";
-import Search from "../components/Search";
+import Page from "../components/Page";
 import Content from "../components/Content";
 
 export default function Group({ schedule, group, teacher }) {
   const router = useRouter();
-  const [search, setSearch] = useState(false);
-
-  function showSearch() {
-    setSearch(true);
-  }
-
-  function hideSearch() {
-    setSearch(false);
-  }
 
   if (router.isFallback) {
     return null;
@@ -30,10 +19,7 @@ export default function Group({ schedule, group, teacher }) {
         <meta name="theme-color" content="#121212" />
       </Head>
       <Content>
-        <Header onSearchClick={showSearch} />
-        {search ? (
-          <Search onBackClick={hideSearch} />
-        ) : (
+        <Page>
           <div className="mt-0 w-full px-4">
             {schedule.map(({ date, pairs, weekDay }, id) => (
               <div key={id}>
@@ -74,7 +60,7 @@ export default function Group({ schedule, group, teacher }) {
               </div>
             ))}
           </div>
-        )}
+        </Page>
       </Content>
     </>
   );
@@ -102,10 +88,7 @@ export async function getStaticProps({ params }) {
     slugify(label).toLowerCase()
   );
 
-  if (
-    !slugifiedGroups.includes(slug) &&
-    !slugifiedTeachers.includes(slug)
-  ) {
+  if (!slugifiedGroups.includes(slug) && !slugifiedTeachers.includes(slug)) {
     return { notFound: true };
   }
 

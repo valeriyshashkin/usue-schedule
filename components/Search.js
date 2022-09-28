@@ -2,19 +2,11 @@ import { ArrowLeftIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import Cookies from "js-cookie";
 import slugify from "slugify";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import Fuse from "fuse.js";
+import { useState } from "react";
 
-export default function Search({ onBackClick }) {
+export default function Search({ onBackClick, fuse }) {
   const [query, setQuery] = useState("");
   const [tips, setTips] = useState([]);
-  const [fuse, setFuse] = useState();
-
-  useEffect(() => {
-    fetch("/api/tips")
-      .then((res) => res.json())
-      .then((res) => setFuse(new Fuse(res, { keys: ["label"] })));
-  }, []);
 
   function rememberGroup({ target: { innerText } }) {
     Cookies.set("group", innerText);
