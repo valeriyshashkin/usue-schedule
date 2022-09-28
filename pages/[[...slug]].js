@@ -110,7 +110,7 @@ export default function Group({ schedule, group, teacher }) {
               ))}
             </div>
           </div>
-        ) : schedule ? (
+        ) : group || teacher ? (
           <div className="mt-0 w-full px-4">
             {schedule.map(({ date, pairs, weekDay }, id) => (
               <div key={id}>
@@ -174,7 +174,11 @@ export default function Group({ schedule, group, teacher }) {
 
 export async function getStaticPaths() {
   return {
-    paths: [],
+    paths: [
+      {
+        params: { slug: [""] },
+      },
+    ],
     fallback: true,
   };
 }
@@ -183,6 +187,8 @@ export async function getStaticProps({ params }) {
   if (params.slug === undefined) {
     return {
       props: {
+        schedule: [],
+        teacher: "",
         group: "",
       },
     };
@@ -190,11 +196,11 @@ export async function getStaticProps({ params }) {
 
   const { slug } = params;
 
-  const groups = await (
-    await fetch("https://www.usue.ru/schedule/?action=group-list")
-  ).json();
   const teachers = await (
     await fetch("https://www.usue.ru/schedule/?action=teacher-list")
+  ).json();
+  const groups = await (
+    await fetch("https://www.usue.ru/schedule/?action=group-list")
   ).json();
 
   const slugifiedGroups = groups.map((g) => slugify(g).toLowerCase());
