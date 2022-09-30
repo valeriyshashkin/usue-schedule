@@ -9,7 +9,7 @@ export default function Search({ onBackClick, fuse }) {
   const [tips, setTips] = useState([]);
 
   function rememberGroup({ target: { innerText } }) {
-    Cookies.set("group", innerText);
+    Cookies.set("group", innerText, { expires: 365 });
     onBackClick();
   }
 
