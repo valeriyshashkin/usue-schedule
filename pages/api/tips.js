@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   res.setHeader(
     "Cache-Control",
-    `public, s-maxage=${60 * 60 * 3}, stale-while-revalidate=${60 * 60 * 6 - 1}`
+    `public, s-maxage=${60 * 60 * 24 * 90}`
   );
 
   res.json([...teachers, ...groups.map((g) => ({ label: g }))]);
