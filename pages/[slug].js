@@ -67,22 +67,8 @@ export default function Group({ schedule, group, teacher, tips }) {
 }
 
 export async function getStaticPaths() {
-  const teachers = await (
-    await fetch("https://www.usue.ru/schedule/?action=teacher-list")
-  ).json();
-  const groups = await (
-    await fetch("https://www.usue.ru/schedule/?action=group-list")
-  ).json();
-
-  const slugifiedGroups = groups.map((g) => slugify(g).toLowerCase());
-  const slugifiedTeachers = teachers.map(({ label }) =>
-    slugify(label).toLowerCase()
-  );
-
   return {
-    paths: [...slugifiedGroups, ...slugifiedTeachers].map((p) => ({
-      params: { slug: slugify(p).toLowerCase() },
-    })).filter(p => p.params.slug !== ""),
+    paths: [],
     fallback: true,
   };
 }
