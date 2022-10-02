@@ -82,7 +82,7 @@ export async function getStaticPaths() {
   return {
     paths: [...slugifiedGroups, ...slugifiedTeachers].map((p) => ({
       params: { slug: slugify(p).toLowerCase() },
-    })),
+    })).filter(p => p.params.slug !== ""),
     fallback: true,
   };
 }
