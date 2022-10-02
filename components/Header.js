@@ -2,7 +2,7 @@ import Cookies from "js-cookie";
 import { ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 
-export default function Header({ homepage, onSearchClick, loading }) {
+export default function Header({ homepage, onSearchClick }) {
   function reset() {
     Cookies.remove("group");
   }
@@ -18,11 +18,7 @@ export default function Header({ homepage, onSearchClick, loading }) {
       )}
       <h1 className="font-bold text-2xl">ush</h1>
       <button onClick={onSearchClick}>
-        {loading ? (
-          <div className="w-6"></div>
-        ) : (
-          <MagnifyingGlassIcon className="w-6" />
-        )}
+        <MagnifyingGlassIcon className="w-6" />
       </button>
     </div>
   );

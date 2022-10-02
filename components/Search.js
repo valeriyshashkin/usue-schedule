@@ -4,7 +4,7 @@ import slugify from "slugify";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function Search({ onBackClick, fuse }) {
+export default function Search({ onBackClick, allTips }) {
   const [query, setQuery] = useState("");
   const [tips, setTips] = useState([]);
 
@@ -20,7 +20,15 @@ export default function Search({ onBackClick, fuse }) {
 
   function changeQuery({ target: { value } }) {
     setQuery(value);
-    setTips(fuse.search(value).slice(0, 14));
+
+    if (value.length === 0) {
+      setTips([]);
+      return;
+    }
+
+    setTips(
+      allTips.filter((t) => t.toLowerCase().startsWith(value)).slice(0, 10)
+    );
   }
 
   return (
@@ -45,10 +53,10 @@ export default function Search({ onBackClick, fuse }) {
         </div>
       </div>
       <div className="divide-y divide-neutral-500 pt-2">
-        {tips.map(({ item: { label } }, i) => (
-          <Link key={i} href={`/${slugify(label).toLowerCase()}`}>
+        {tips.map((t, i) => (
+          <Link key={i} href={`/${slugify(t).toLowerCase()}`}>
             <a onClick={rememberGroup} className="py-4 block">
-              {label}
+              {t}
             </a>
           </Link>
         ))}

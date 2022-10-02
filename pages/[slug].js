@@ -5,7 +5,7 @@ import slugify from "slugify";
 import Page from "../components/Page";
 import Content from "../components/Content";
 
-export default function Group({ schedule, group, teacher }) {
+export default function Group({ schedule, group, teacher, tips }) {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -19,7 +19,7 @@ export default function Group({ schedule, group, teacher }) {
         <meta name="theme-color" content="#121212" />
       </Head>
       <Content>
-        <Page>
+        <Page tips={tips}>
           <div className="mt-0 w-full px-4">
             {schedule.map(({ date, pairs, weekDay }, id) => (
               <div key={id}>
@@ -67,8 +67,22 @@ export default function Group({ schedule, group, teacher }) {
 }
 
 export async function getStaticPaths() {
+  const teachers = await (
+    await fetch("https://www.usue.ru/schedule/?action=teacher-list")
+  ).json();
+  const groups = await (
+    await fetch("https://www.usue.ru/schedule/?action=group-list")
+  ).json();
+
+  const slugifiedGroups = groups.map((g) => slugify(g).toLowerCase());
+  const slugifiedTeachers = teachers.map(({ label }) =>
+    slugify(label).toLowerCase()
+  );
+
   return {
-    paths: [],
+    paths: [...slugifiedGroups, ...slugifiedTeachers].map((p) => ({
+      params: { slug: slugify(p).toLowerCase() },
+    })),
     fallback: true,
   };
 }
@@ -121,6 +135,7 @@ export async function getStaticProps({ params }) {
       schedule,
       group,
       teacher,
+      tips: [...teachers.map(({ label }) => label), ...groups],
     },
     revalidate: 60 * 60 * 6,
   };
