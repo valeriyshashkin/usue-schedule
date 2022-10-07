@@ -2,14 +2,14 @@ import Image from "next/image";
 import Head from "next/head";
 import Page from "../components/Page";
 
-export default function Home() {
+export default function Home({ tips }) {
   return (
     <>
       <Head>
         <title>ush</title>
         <meta name="theme-color" content="#121212" />
       </Head>
-      <Page homepage>
+      <Page homepage tips={tips}>
         <div className="h-[calc(100vh-120px)] flex flex-col justify-center">
           <svg
             height="50"
@@ -29,4 +29,20 @@ export default function Home() {
       </Page>
     </>
   );
+}
+
+export async function getStaticProps() {
+  const teachers = await (
+    await fetch("https://www.usue.ru/schedule/?action=teacher-list")
+  ).json();
+
+  const groups = await (
+    await fetch("https://www.usue.ru/schedule/?action=group-list")
+  ).json();
+
+  return {
+    props: {
+      tips: [...teachers.map(({ label }) => label), ...groups],
+    },
+  };
 }

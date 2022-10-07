@@ -5,7 +5,7 @@ import slugify from "slugify";
 import Page from "../components/Page";
 import Content from "../components/Content";
 
-export default function Group({ schedule, group, teacher }) {
+export default function Group({ schedule, group, teacher, tips }) {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -19,7 +19,7 @@ export default function Group({ schedule, group, teacher }) {
         <meta name="theme-color" content="#121212" />
       </Head>
       <Content>
-        <Page>
+        <Page tips={tips}>
           <div className="mt-0 w-full px-4">
             {schedule.map(({ date, pairs, weekDay }, id) => (
               <div key={id}>
@@ -121,6 +121,7 @@ export async function getStaticProps({ params }) {
       schedule,
       group,
       teacher,
+      tips: [...teachers.map(({ label }) => label), ...groups],
     },
     revalidate: 60 * 60 * 6,
   };
